@@ -1,0 +1,33 @@
+{% extends "base.html" %}{% set page = "assessments" %}{% from "macros.html" import post_btn with context %}{% block title %}Assessments{% endblock %}
+{% block content %}
+<p><a href="{{ url_for('operator.class_detail', cs_id=csub.class_session_id) }}">← {{ csub.class_session.class_.name }}</a></p>
+<h1>{{ csub.subject.name }} · {{ csub.class_session.class_.name }}</h1>
+{% if not term %}<div class="card">Create a term for this session first.</div>{% else %}
+<form method="get" class="inline term-picker">Term:
+  <select name="term_id" onchange="this.form.submit()">{% for t in terms %}<option value="{{ t.id }}" {{ 'selected' if t.id==term.id }}>{{ t.name }}</option>{% endfor %}</select></form>
+<div class="scroll"><table><tr><th>Printed as</th><th>Assessment</th><th>Max score</th><th>Weight</th><th></th></tr>
+{% for c in comps %}<tr><td>{{ slot_names[c.report_slot] if c.report_slot else 'not printed' }}</td><td>{{ c.name }}</td><td>{{ c.max_score }}</td><td>{{ c.weight }}</td>
+<td><div class="actions">
+  <details class="edit"><summary>Edit</summary>
+    <form method="post" action="{{ url_for('operator.assessment_edit', aid=c.id) }}" class="row">{{ csrf_field() }}
+      <label>Name <input name="name" value="{{ c.name }}" required></label>
+      <label>Max score <input type="number" name="max_score" min="1" value="{{ c.max_score }}" required></label>
+      <label>Weight <input type="number" name="weight" min="1" value="{{ c.weight }}" required></label>
+      <label>Printed as <select name="report_slot">{% for n, label in slot_names.items() %}<option value="{{ n }}" {{ 'selected' if c.report_slot == n }}>{{ label }}</option>{% endfor %}</select></label>
+      <button class="btn small">Save</button></form></details>
+  {{ post_btn(url_for('operator.assessment_delete', aid=c.id), 'Delete', 'btn small danger', 'Delete ' ~ c.name ~ '?') }}
+</div></td></tr>
+{% else %}<tr><td colspan="5" class="muted">None yet.</td></tr>{% endfor %}
+<tr><th colspan="2">Total</th><th>{{ total_max }}</th><th>{{ total_weight }}</th><th></th></tr></table></div>
+{% if unprinted %}<p class="flash error">{{ unprinted }} assessment(s) here are not printed on the result (a subject can show only four columns).</p>{% endif %}
+{% if comps and total_weight != 100 %}<p class="flash error">Weights add up to {{ total_weight }}, not 100. Results will not be correct until they total 100.</p>{% endif %}
+<div class="card"><h2>Add assessment</h2>
+<form method="post" action="{{ url_for('operator.assessment_create', csub_id=csub.id) }}" class="row">{{ csrf_field() }}
+  <input type="hidden" name="term_id" value="{{ term.id }}">
+  <label>Name <input name="name" placeholder="CA 1" required></label>
+  <label>Max score <input type="number" name="max_score" min="1" required></label>
+  <label>Weight <input type="number" name="weight" min="1" required></label>
+  <label>Printed as <select name="report_slot"><option value="">Next free column</option>{% for n, label in slot_names.items() %}{% if n not in used_slots %}<option value="{{ n }}">{{ label }}</option>{% endif %}{% endfor %}</select></label>
+  <button class="btn">Add</button></form>
+  <p class="muted small">Each subject prints up to four columns per term: 1'st CA, 2'nd CA, 3'rd CA and Exams. Weights should add up to 100.</p></div>
+{% endif %}{% endblock %}

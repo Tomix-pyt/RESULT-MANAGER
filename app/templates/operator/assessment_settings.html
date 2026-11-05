@@ -1,0 +1,19 @@
+{% extends "base.html" %}{% set page = "assessments" %}{% block title %}Assessment settings{% endblock %}
+{% block content %}
+<h1>Assessment settings</h1>
+<p class="muted">Configure the assessment components once. This structure is reused for every subject, class level and term. Weights must total 100%.</p>
+<div class="card">
+<form method="post">{{ csrf_field() }}
+<div class="scroll"><table><thead><tr><th>Assessment name</th><th>Maximum mark</th><th>Weight (%)</th><th>Result column</th></tr></thead><tbody>
+{% for item in items %}<tr>
+<td><input name="name" value="{{ item.name }}" required></td>
+<td><input name="max_score" type="number" min="1" value="{{ item.max_score }}" required></td>
+<td><input name="weight" type="number" min="1" max="100" value="{{ item.weight }}" required></td>
+<td><select name="report_slot">{% for n,label in slot_names.items() %}<option value="{{ n }}" {{ 'selected' if item.report_slot == n }}>{{ label }}</option>{% endfor %}</select></td>
+</tr>{% endfor %}
+{% for _ in range(4 - items|length) %}<tr><td><input name="name" placeholder="Optional assessment"></td><td><input name="max_score" type="number" min="1" placeholder="Max"></td><td><input name="weight" type="number" min="1" max="100" placeholder="Weight"></td><td><select name="report_slot"><option value="">Not used</option>{% for n,label in slot_names.items() %}<option value="{{ n }}">{{ label }}</option>{% endfor %}</select></td></tr>{% endfor %}
+</tbody></table></div>
+<p><button class="btn">Save school-wide assessment structure</button></p>
+</form></div>
+<p class="muted small">Changes update assessment components that have no scores yet. Components with existing scores are preserved so historical results are not silently changed.</p>
+{% endblock %}

@@ -1,0 +1,6 @@
+/* pages/settings.css  -  only affects pages whose <main> has class "page-settings".
+   Shared styles are in ../base.css. School settings form. */
+.page-settings .brand-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem}
+.page-settings .brand-box{border:1px solid var(--line);border-radius:10px;padding:.8rem}
+.page-settings .brand-img{display:block;max-width:100%;max-height:110px;background:#fff;border:1px solid var(--line);border-radius:6px;margin:.4rem 0 .6rem;padding:4px}
+.page-settings h3{margin:.1rem 0}

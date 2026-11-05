@@ -1,0 +1,11 @@
+{% extends "base.html" %}{% set page = "students" %}{% block title %}Students{% endblock %}
+{% block content %}
+<div class="page-head"><h1>Students</h1>
+  <div class="actions"><a class="btn" href="{{ url_for('operator.student_new') }}">+ Add a student</a>
+    <a class="btn ghost" href="{{ url_for('operator.former_students') }}">Former students{% if former_count %} ({{ former_count }}){% endif %}</a></div></div>
+<form method="get" class="row search"><input name="q" value="{{ q }}" placeholder="Search by name or admission number"><button class="btn small">Search</button></form>
+<div class="scroll"><table><tr><th>Admission no.</th><th>Name</th><th>Class{% if session %} · {{ session.name }}{% endif %}</th></tr>
+{% for s in students %}<tr><td>{{ s.admission_number }}</td><td><a href="{{ url_for('operator.student_detail', sid=s.id) }}">{{ s.full_name }}</a></td>
+<td>{% if classes.get(s.id) %}{{ classes[s.id] }}{% else %}<span class="badge warn">Not enrolled</span>{% endif %}</td></tr>
+{% else %}<tr><td colspan="3" class="muted">No active students found.</td></tr>{% endfor %}</table></div>
+{% endblock %}

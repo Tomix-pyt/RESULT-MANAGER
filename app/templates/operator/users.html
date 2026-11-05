@@ -1,0 +1,38 @@
+{% extends "base.html" %}{% set page = "users" %}{% from "macros.html" import post_btn with context %}{% block title %}Users{% endblock %}
+{% block content %}
+<h1>Users & staff</h1>
+<div class="card">
+  <h2>Add a user</h2>
+  <form method="post" class="row">{{ csrf_field() }}
+    <label>Username <input name="username" required></label>
+    <label>First name <input name="first_name" required></label>
+    <label>Last name <input name="last_name" required></label>
+    <label>Email <input type="email" name="email"></label>
+    <label>Password <input type="password" name="password" minlength="8" required></label>
+    <label>Role <select name="role"><option value="STAFF">Staff</option><option value="OPERATOR">Operator</option></select></label>
+    <button class="btn">Create</button>
+  </form>
+</div>
+<div class="scroll"><table>
+  <tr><th>Name</th><th>Username</th><th>Role</th><th>Status</th><th></th></tr>
+  {% for u in users %}
+  <tr>
+    <td>{{ u.full_name }}<div class="small muted">{{ u.email or '' }}</div></td><td>{{ u.username }}</td><td>{{ u.role }}</td>
+    <td>{% if u.is_active %}<span class="badge ok">active</span>{% else %}<span class="badge off">disabled</span>{% endif %}</td>
+    <td><div class="actions">
+      {% if u.id != current_user.id %}{{ post_btn(url_for('operator.user_active', user_id=u.id), 'Disable' if u.is_active else 'Enable', 'btn small ' ~ ('danger' if u.is_active else ''), None, {'active': 0 if u.is_active else 1}) }}{% endif %}
+      <details class="edit"><summary>Edit</summary>
+        <form method="post" action="{{ url_for('operator.user_edit', user_id=u.id) }}" class="row">{{ csrf_field() }}
+          <label>First name <input name="first_name" value="{{ u.first_name }}" required></label>
+          <label>Last name <input name="last_name" value="{{ u.last_name }}" required></label>
+          <label>Email <input type="email" name="email" value="{{ u.email or '' }}"></label>
+          <label>Role <select name="role" {{ 'disabled' if u.id == current_user.id }}><option value="STAFF" {{ 'selected' if u.role=='STAFF' }}>Staff</option><option value="OPERATOR" {{ 'selected' if u.role=='OPERATOR' }}>Operator</option></select></label>
+          <button class="btn small">Save</button></form>
+        <form method="post" action="{{ url_for('operator.user_password', user_id=u.id) }}" class="row reset-password">{{ csrf_field() }}
+          <label>New password <input type="password" name="password" minlength="8" required></label>
+          <button class="btn small ghost">Reset password</button></form></details>
+    </div></td>
+  </tr>
+  {% endfor %}
+</table></div>
+{% endblock %}

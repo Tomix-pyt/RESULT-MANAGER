@@ -1,0 +1,2 @@
+{% extends "base.html" %}{% set page = "error" %}{% block title %}No access{% endblock %}
+{% block content %}<div class="card narrow"><h1>Access denied</h1><p>{{ message }}</p><a class="btn" href="{{ url_for('index') }}">Go home</a></div>{% endblock %}

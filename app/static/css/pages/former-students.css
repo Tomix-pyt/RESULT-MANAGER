@@ -1,0 +1,5 @@
+/* pages/former-students.css - graduated / withdrawn / transferred list. */
+.page-former-students .chips{display:flex;gap:.5rem;flex-wrap:wrap;margin:.6rem 0 1rem}
+.page-former-students .chip-link{padding:.3rem .8rem;border:1px solid var(--line);border-radius:99px;text-decoration:none;font-size:.9rem}
+.page-former-students .chip-link.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+.page-former-students .search{margin-bottom:1rem}

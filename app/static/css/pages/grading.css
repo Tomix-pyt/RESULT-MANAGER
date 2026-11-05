@@ -1,0 +1,3 @@
+/* pages/grading.css  -  only affects pages whose <main> has class "page-grading".
+   Shared styles are in ../base.css. Grading scales and boundaries. */
+.page-grading .scale-actions{margin-bottom:.7rem}

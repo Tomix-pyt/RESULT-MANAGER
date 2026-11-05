@@ -1,0 +1,68 @@
+{% extends "base.html" %}{% set page = "score-entry" %}{% block title %}Enter scores{% endblock %}
+{% block content %}
+<p><a href="{{ back }}">← Back</a></p>
+<h1>Enter scores · {{ cs.class_.name }} <span class="muted">{{ cs.academic_session.name }}</span></h1>
+
+<div class="entry-bar">
+  <form method="get" class="inline term-picker">Term:
+    <select name="term_id" onchange="this.form.submit()">{% for t in terms %}<option value="{{ t.id }}" {{ 'selected' if t.id == term.id }}>{{ t.name }}</option>{% endfor %}</select></form>
+  {% if mode == 'class' %}<span class="counter" id="counter">Student 1 of {{ slides|length }}</span>
+  <select id="jump" aria-label="Jump to student">{% for sl in slides %}<option value="{{ loop.index0 }}">{{ loop.index }}. {{ sl.enr.student.full_name }}</option>{% endfor %}</select>{% endif %}
+</div>
+{% if summary.all_locked %}<p class="flash error">This term is locked for every subject. Unlock it on the class page to change scores.</p>{% endif %}
+{% if not slides %}<div class="card">There are no active students in this class.</div>{% endif %}
+
+<div class="slides" id="slides" data-start="{{ start_index }}">
+{% for sl in slides %}{% set enr = sl.enr %}
+<form class="slide" id="slide-{{ enr.id }}" method="post" action="{{ url_for('results.save_scores', eid=enr.id) }}">
+  {{ csrf_field() }}<input type="hidden" name="term_id" value="{{ term.id }}"><input type="hidden" name="back" value="{{ here }}">
+  <header class="who">
+    <div><h2>{{ enr.student.full_name }}</h2><span class="muted">{{ enr.student.admission_number }}{% if enr.roll_number %} · No. {{ enr.roll_number }}{% endif %}{% if enr.student.status != 'ACTIVE' %} · {{ enr.student.status }}{% endif %}</span></div>
+    <div class="overall">Average <b data-average>{{ sl.report.average|mark if sl.report and sl.report.average is not none else '–' }}</b> · Position <b data-position>{{ sl.report.position|ordinal if sl.report and sl.report.position else '–' }}</b></div>
+  </header>
+  <div class="scroll"><table class="grid">
+    <tr><th class="subj">Subject</th>{% for l in slot_labels %}<th>{{ l }}</th>{% endfor %}<th>Total</th><th>Grade</th><th>Pos.</th></tr>
+    {% for row in sl.sheet %}
+    <tr class="{{ 'is-locked' if row.locked }}" data-csub="{{ row.class_subject.id }}" data-weight-total="{{ row.weight_total }}">
+      <th class="subj">{{ row.name }}{% if row.locked %} <span title="Locked">🔒</span>{% endif %}</th>
+      {% if not row.configured %}
+        <td colspan="4" class="na-row">No assessments set up. <a href="{{ url_for('operator.assessment_settings') }}">Set up</a></td>
+      {% else %}
+        {% for cell in row.cells %}<td>{% if cell.component %}<input name="c{{ cell.component.id }}" value="{{ cell.score|mark }}" inputmode="decimal" autocomplete="off"
+          data-max="{{ cell.component.max_score }}" data-weight="{{ cell.component.weight }}" placeholder="/{{ cell.component.max_score }}" aria-label="{{ row.name }} {{ cell.label }}"{{ ' disabled' if row.locked }}>{% else %}<span class="na">–</span>{% endif %}</td>{% endfor %}
+      {% endif %}
+      <td class="tot" data-total>{{ row.result.total_score|mark if row.result and row.result.total_score is not none else '' }}</td>
+      <td data-grade>{{ row.result.grade if row.result and row.result.grade else '' }}</td>
+      <td data-pos>{{ row.result.position|ordinal if row.result and row.result.position else '' }}</td>
+    </tr>
+    {% else %}<tr><td colspan="8" class="muted">This student takes no subjects yet.</td></tr>{% endfor %}
+  </table></div>
+
+  <details class="extras"><summary>Remarks &amp; ratings</summary>
+    <div class="remarks">
+      <label>Form teacher's remark <textarea name="form_teacher_remark" rows="2" maxlength="300">{{ sl.report.form_teacher_remark if sl.report and sl.report.form_teacher_remark else '' }}</textarea></label>
+      <label>Principal's remark <textarea name="principal_remark" rows="2" maxlength="300">{{ sl.report.principal_remark if sl.report and sl.report.principal_remark else '' }}</textarea></label>
+    </div>
+    <p class="muted small">Ratings (5 Excellent · 4 V.Good · 3 Good · 2 Fair · 1 Poor). Those marked <i>suggested</i> follow the student's average and update when scores change; change one and it stays as you set it.</p>
+    <div class="ratings">
+      {% for title, items in [('Affective development', affective), ('Psychomotor skills', psychomotor)] %}
+      <fieldset><legend>{{ title }}</legend>
+        {% for key, label in items %}{% set t = sl.traits.get(key) %}
+        <label>{{ label }}<select name="r_{{ key }}"><option value="">–</option>{% for n in [5,4,3,2,1] %}<option value="{{ n }}" {{ 'selected' if t and t.rating == n }}>{{ n }}</option>{% endfor %}</select>
+          {% if t and t.source == 'AUTO' %}<i class="auto">suggested</i>{% endif %}</label>
+        {% endfor %}</fieldset>
+      {% endfor %}
+    </div>
+  </details>
+
+  <footer class="nav">
+    {% if mode == 'class' %}<button type="button" class="btn ghost" data-prev>← Previous</button>{% endif %}
+    <span class="status" role="status" data-status></span>
+    <button type="submit" class="btn ghost" data-save>Save</button>
+    {% if mode == 'class' %}<button type="submit" class="btn" data-advance>Save &amp; next →</button>{% endif %}
+  </footer>
+</form>
+{% endfor %}
+</div>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/pages/score-entry.js') }}"></script>{% endblock %}

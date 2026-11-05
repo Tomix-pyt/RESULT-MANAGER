@@ -1,0 +1,2 @@
+{% extends "base.html" %}{% set page = "error" %}{% block title %}Offline{% endblock %}
+{% block content %}<div class="card narrow"><h1>You're offline</h1><p>Results Manager needs a connection to save scores. Reconnect and try again.</p><button class="btn" onclick="location.reload()">Retry</button></div>{% endblock %}

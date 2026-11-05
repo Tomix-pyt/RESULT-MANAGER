@@ -1,0 +1,76 @@
+{% extends "base.html" %}{% set page = "score-entry" %}{% block title %}Enter scores{% endblock %}
+{% block content %}
+<p><a href="{{ url_for('staff.dashboard') }}">← My classes</a></p>
+<h1>{{ csub.subject.name }} · {{ csub.class_session.class_.name }}</h1>
+
+<div class="entry-bar">
+  <form method="get" class="inline term-picker">Term:
+    <select name="term_id" onchange="this.form.submit()">
+      {% for t in terms %}<option value="{{ t.id }}" {{ 'selected' if t.id == term.id }}>{{ t.name }}</option>{% endfor %}
+    </select>
+  </form>
+  <span class="counter" id="counter">Student {{ start_index + 1 }} of {{ enrollments|length }}</span>
+  {% if enrollments %}
+  <select id="jump" aria-label="Jump to student">
+    {% for enr in enrollments %}<option value="{{ loop.index0 }}" {{ 'selected' if loop.index0 == start_index }}>{{ loop.index }}. {{ enr.student.full_name }}</option>{% endfor %}
+  </select>
+  {% endif %}
+</div>
+
+{% if locked %}<p class="flash error">This subject's results are locked for this term.</p>{% endif %}
+{% if deadline_passed %}<p class="flash error">The score-entry deadline for this term has passed.</p>{% endif %}
+{% if not components %}<div class="card">The operator has not configured the school assessment structure yet.</div>
+{% elif not enrollments %}<div class="card">No students are enrolled for this subject.</div>
+{% else %}
+<div class="slides" id="slides" data-start="{{ start_index }}">
+{% for enr in enrollments %}
+  {% set result = results.get(enr.student_id) %}
+  {% set report = reports.get(enr.id) %}
+  <form class="slide" id="slide-{{ enr.id }}" method="post"
+        action="{{ url_for('staff.subject_scores', csub_id=csub.id, term_id=term.id) }}">
+    {{ csrf_field() }}
+    <input type="hidden" name="term_id" value="{{ term.id }}">
+    <input type="hidden" name="enrollment_id" value="{{ enr.id }}">
+    <header class="who">
+      <div>
+        <h2>{{ enr.student.full_name }}</h2>
+        <span class="muted">{{ enr.student.admission_number }}{% if enr.roll_number %} · No. {{ enr.roll_number }}{% endif %}</span>
+      </div>
+      <div class="overall">Average <b data-average>{{ report.average|mark if report and report.average is not none else '–' }}</b> · Position <b data-position>{{ report.position|ordinal if report and report.position else '–' }}</b></div>
+    </header>
+
+    <div class="scroll"><table class="grid">
+      <thead><tr><th class="subj">Subject</th>
+        {% for comp in components %}<th>{{ comp.name }}</th>{% endfor %}
+        <th>Total</th><th>Grade</th><th>Pos.</th>
+      </tr></thead>
+      <tbody><tr data-csub="{{ csub.id }}" data-weight-total="{{ components|sum(attribute='weight') }}" class="{{ 'is-locked' if locked }}">
+        <th class="subj">{{ csub.subject.name }}</th>
+        {% for comp in components %}
+        <td><input type="number" step="0.01" min="0" max="{{ comp.max_score }}"
+          name="score_{{ enr.id }}_{{ comp.id }}"
+          value="{{ score_values.get((enr.student_id, comp.id), '')|mark if score_values.get((enr.student_id, comp.id)) is not none else '' }}"
+          inputmode="decimal" autocomplete="off" data-max="{{ comp.max_score }}" data-weight="{{ comp.weight }}"
+          placeholder="/{{ comp.max_score }}" aria-label="{{ comp.name }} score for {{ enr.student.full_name }}"
+          {{ 'disabled' if locked or deadline_passed }}></td>
+        {% endfor %}
+        <td class="tot" data-total>{{ result.total_score|mark if result and result.total_score is not none else '' }}</td>
+        <td data-grade>{{ result.grade if result and result.grade else '' }}</td>
+        <td data-pos>{{ result.position|ordinal if result and result.position else '' }}</td>
+      </tr></tbody>
+    </table></div>
+
+    <footer class="nav">
+      <button type="button" class="btn ghost" data-prev {% if loop.first %}disabled{% endif %}>← Previous</button>
+      <span class="status" role="status" data-status></span>
+      {% if not locked and not deadline_passed %}
+        <button type="submit" class="btn ghost" data-save>Save</button>
+        <button type="submit" class="btn" data-advance name="advance" value="1" {% if loop.last %}disabled{% endif %}>Save &amp; next →</button>
+      {% endif %}
+    </footer>
+  </form>
+{% endfor %}
+</div>
+{% endif %}
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/pages/score-entry.js') }}"></script>{% endblock %}

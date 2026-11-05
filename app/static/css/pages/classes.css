@@ -1,0 +1,3 @@
+/* pages/classes.css  -  only affects pages whose <main> has class "page-classes".
+   Shared styles are in ../base.css. Class list. */
+.page-classes .session-picker{margin-bottom:1rem}

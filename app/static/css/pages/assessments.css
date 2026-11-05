@@ -1,0 +1,3 @@
+/* pages/assessments.css  -  only affects pages whose <main> has class "page-assessments".
+   Shared styles are in ../base.css. CA / exam setup for one subject. */
+.page-assessments .term-picker{margin-bottom:1rem}

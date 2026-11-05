@@ -1,0 +1,8 @@
+/* pages/dashboard.css  -  only affects pages whose <main> has class "page-dashboard".
+   Shared styles are in ../base.css. Operator overview: stat tiles. */
+.page-dashboard .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1rem;margin-bottom:1rem}
+.page-dashboard .stat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:1rem;color:var(--muted)}
+.page-dashboard .stat span{display:block;font-size:2rem;font-weight:700;color:var(--text)}
+.page-dashboard .stat.warn span{color:var(--warn)}
+.page-dashboard a.stat{text-decoration:none;color:var(--muted)}
+.page-dashboard a.stat:hover{border-color:var(--blue)}

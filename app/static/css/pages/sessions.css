@@ -1,0 +1,3 @@
+/* pages/sessions.css  -  only affects pages whose <main> has class "page-sessions".
+   Shared styles are in ../base.css. Sessions & terms. */
+.page-sessions .terms-table{margin-top:.8rem}

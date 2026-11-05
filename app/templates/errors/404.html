@@ -1,0 +1,2 @@
+{% extends "base.html" %}{% set page = "error" %}{% block title %}Not found{% endblock %}
+{% block content %}<div class="card narrow"><h1>Not found</h1><p>{{ message }}</p><a class="btn" href="{{ url_for('index') }}">Go home</a></div>{% endblock %}

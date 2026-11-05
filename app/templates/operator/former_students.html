@@ -1,0 +1,16 @@
+{% extends "base.html" %}{% set page = "former-students" %}{% block title %}Former students{% endblock %}
+{% block content %}
+<p><a href="{{ url_for('operator.students') }}">← Students</a></p>
+<h1>Former students</h1>
+<p class="muted">Graduated, withdrawn, transferred or inactive students. Open one to see and print their results for any class, term or year.</p>
+<div class="chips">
+  <a class="chip-link {{ 'on' if not status }}" href="{{ url_for('operator.former_students', q=q) }}">All ({{ counts.values()|sum }})</a>
+  {% for st in ['GRADUATED','WITHDRAWN','TRANSFERRED','INACTIVE'] %}<a class="chip-link {{ 'on' if status == st }}" href="{{ url_for('operator.former_students', status=st, q=q) }}">{{ st.title() }} ({{ counts.get(st, 0) }})</a>{% endfor %}
+</div>
+<form method="get" class="row search"><input type="hidden" name="status" value="{{ status }}"><input name="q" value="{{ q }}" placeholder="Search by name or admission number"><button class="btn small">Search</button></form>
+<div class="scroll"><table><tr><th>Admission no.</th><th>Name</th><th>Status</th><th>Last class</th></tr>
+{% for s in students %}{% set last = (s.enrollments|sort(attribute='id'))|last %}
+<tr><td>{{ s.admission_number }}</td><td><a href="{{ url_for('operator.student_detail', sid=s.id) }}">{{ s.full_name }}</a></td><td>{{ s.status.title() }}</td>
+<td>{% if last %}{{ last.class_session.class_.name }} · {{ last.class_session.academic_session.name }}{% else %}–{% endif %}</td></tr>
+{% else %}<tr><td colspan="4" class="muted">No former students found.</td></tr>{% endfor %}</table></div>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "base.html" %}{% set page = "staff-dashboard" %}
+{% block title %}MY CLASSES{% endblock %}
+{% block content %}
+<h1>MY CLASSES</h1>
+{% if assignments %}
+<div class="grid">
+  {% for a in assignments %}
+  <a class="card" href="{{ url_for('staff.subject_scores', csub_id=a.class_subject_id) }}">
+    <h2>{{ a.class_subject.subject.name }}</h2>
+    <p class="muted">{{ a.class_subject.class_session.class_.name }} · {{ a.academic_session.name }}</p>
+    <span class="btn small">Enter scores →</span>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card"><p>You have no class assignments for the current session yet. Ask the operator to assign you.</p></div>
+{% endif %}
+{% endblock %}

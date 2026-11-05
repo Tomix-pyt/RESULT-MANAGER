@@ -1,0 +1,16 @@
+{% extends "base.html" %}{% set page = "audit" %}{% block title %}Audit log{% endblock %}
+{% block content %}
+<h1>Audit log</h1>
+<form method="get" class="card row">
+  <label>Action <select name="action"><option value="">All</option>{% for a in actions %}<option {{ 'selected' if a==action }}>{{ a }}</option>{% endfor %}</select></label>
+  <label>User <select name="user_id"><option value="">Anyone</option>{% for u in users %}<option value="{{ u.id }}" {{ 'selected' if who==u.id }}>{{ u.username }}</option>{% endfor %}</select></label>
+  <label>Contains <input name="q" value="{{ q }}"></label><button class="btn">Filter</button></form>
+<div class="scroll"><table><tr><th>When</th><th>User</th><th>Action</th><th>Details</th><th>IP</th></tr>
+{% for a in page.items %}<tr><td class="when">{{ a.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+<td>{{ a.user.username if a.user else '—' }}</td><td><code>{{ a.action }}</code></td><td>{{ a.description or '' }}</td><td class="small muted">{{ a.ip_address or '' }}</td></tr>
+{% else %}<tr><td colspan="5" class="muted">Nothing logged yet.</td></tr>{% endfor %}</table></div>
+<div class="pager">
+  {% if page.has_prev %}<a href="{{ url_for('operator.audit', page=page.prev_num, action=action, user_id=who or '', q=q) }}">← Newer</a>{% endif %}
+  <span class="muted">Page {{ page.page }} of {{ page.pages or 1 }}</span>
+  {% if page.has_next %}<a href="{{ url_for('operator.audit', page=page.next_num, action=action, user_id=who or '', q=q) }}">Older →</a>{% endif %}
+</div>{% endblock %}

@@ -1,0 +1,9 @@
+{% macro post_btn(url, label, cls='btn small ghost', confirm=None, fields={}) -%}
+<form method="post" action="{{ url }}" class="inline"{% if confirm %} data-confirm="{{ confirm }}"{% endif %}>{{ csrf_field() }}
+{%- for k, v in fields.items() %}<input type="hidden" name="{{ k }}" value="{{ v }}">{% endfor -%}
+<button class="{{ cls }}">{{ label }}</button></form>
+{%- endmacro %}
+
+{% macro nav(endpoint, label, match=None) -%}
+<a href="{{ url_for(endpoint) }}" class="{{ 'active' if request.endpoint and (request.endpoint == endpoint or (match and request.endpoint.startswith(match))) }}">{{ label }}</a>
+{%- endmacro %}

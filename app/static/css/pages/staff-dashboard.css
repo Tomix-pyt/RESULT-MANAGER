@@ -1,0 +1,3 @@
+/* pages/staff-dashboard.css  -  only affects pages whose <main> has class "page-staff-dashboard".
+   Shared styles are in ../base.css. Staff home: grid of assigned classes. */
+.page-staff-dashboard .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1rem;margin-bottom:1rem}

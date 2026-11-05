@@ -1,0 +1,120 @@
+/* pages/report.css  -  the printed result sheet (terminal and annual), A4 portrait.
+   Built from score_sheet_template.xlsx: same column proportions, row heights, colours, borders and
+   labels, at the template's 90% print scale. Only affects pages whose <body> has class "page-report". */
+@page{size:A4;margin:19.05mm 6.35mm}
+.page-report{margin:0;background:#cfd4dc;color:#000;font-family:Cambria,'Cambria Math',Caladea,Georgia,'Times New Roman',serif;font-size:9.9pt}
+.page-report .toolbar{position:sticky;top:0;z-index:5;display:flex;gap:12px;align-items:center;justify-content:space-between;padding:8px 14px;background:#173a69;color:#fff;font:14px system-ui,sans-serif}
+.page-report .tb-title{flex:1;text-align:center;opacity:.9}.page-report .tb-btn{background:#fff;color:#173a69;border:0;border-radius:6px;padding:6px 12px;text-decoration:none;font:inherit;cursor:pointer}.page-report .tb-primary{background:#ffd54a}
+.page-report .sheet{width:197.3mm;margin:14px auto;background:#fff;box-sizing:border-box;page-break-after:always;break-after:page;overflow:hidden}
+@media print{.page-report{background:#fff}.page-report .toolbar{display:none}.page-report .sheet{margin:0;width:auto}.page-report .sheet:last-child{page-break-after:auto;break-after:auto}}
+.page-report table{width:100%;border-collapse:collapse;table-layout:fixed}.page-report td{padding:0 2pt;vertical-align:middle;overflow:hidden}
+.page-report .ca{width:24.106%}
+.page-report .mid .ca{width:30.405%}
+.page-report .cb{width:5.408%}
+.page-report .mid .cb{width:6.821%}
+.page-report .cc{width:4.491%}
+.page-report .mid .cc{width:5.665%}
+.page-report .cd{width:4.858%}
+.page-report .mid .cd{width:6.127%}
+.page-report .ce{width:4.491%}
+.page-report .mid .ce{width:5.665%}
+.page-report .cf{width:5.408%}
+.page-report .mid .cf{width:6.821%}
+.page-report .cg{width:5.500%}
+.page-report .mid .cg{width:6.936%}
+.page-report .ch{width:5.225%}
+.page-report .mid .ch{width:6.590%}
+.page-report .ci{width:5.133%}
+.page-report .mid .ci{width:6.474%}
+.page-report .cj{width:5.133%}
+.page-report .mid .cj{width:6.474%}
+.page-report .ck{width:8.891%}
+.page-report .mid .ck{width:11.214%}
+.page-report .cl{width:0.642%}
+.page-report .mid .cl{width:0.809%}
+.page-report .cm{width:12.741%}
+.page-report .panel .cm{width:61.504%}
+.page-report .cn{width:7.974%}
+.page-report .panel .cn{width:38.496%}
+.page-report .head{border:.5pt solid #000;border-right:0.75pt solid #000;border-bottom:0.75pt solid #000}
+.page-report .logo-cell{width:20%;height:68.85pt;vertical-align:middle;text-align:center;padding:0}
+.page-report .logo-img{height:67.47pt;width:auto}
+.page-report .titles{padding:0}.page-report .title{text-align:center;font-family:'Tw Cen MT Condensed Extra Bold','Arial Narrow','Liberation Sans Narrow','DejaVu Sans Condensed','sans-serif';font-size:14pt;line-height:1;white-space:nowrap;overflow:hidden;display:flex;align-items:center;justify-content:center;font-weight:600;}
+.page-report .t1{height:27.68pt}.page-report .t2{height:20.25pt}.page-report .t3{height:20.93pt}
+.page-report .g7{height:4.05pt}.page-report .g12{height:3.38pt;border-top:0.75pt solid #000}
+.page-report .bar{font-family:'Tw Cen MT Condensed Extra Bold','Arial Narrow','Liberation Sans Narrow','DejaVu Sans Condensed',sans-serif;font-size:12.6pt;text-align:center;color:#000000;background:#0f243e;display:flex;align-items:center;
+   justify-content:center;border:0.75pt solid #000; font-weight: 600;}
+.page-report .b8{height:17.55pt}.page-report .b13{height:16.88pt}.page-report .b33{height:17.55pt}
+.page-report .r9{height:26.32pt;border-right:0.75pt solid #000}.page-report .r10{height:21.6pt;border-right:0.75pt solid #000}.page-report .r11{height:20.25pt;border-right:0.75pt solid #000}
+.page-report .lbl{font-size:10.8pt;white-space:nowrap}.page-report .val{font-weight:bold}.page-report .ctr{text-align:center}
+.page-report .vl{border-left:0.75pt solid #000;}.page-report .vr{border-right:0.75pt solid #000}.page-report .info .last td{border-bottom:0.75pt solid #000}
+.page-report .info td.lbl{padding-left:2pt;}
+.page-report .mid-wrap{table-layout:fixed}.page-report .mid-wrap>tbody>tr>td{padding:0;border:0;vertical-align:top;overflow:visible}
+.page-report .mid-left{width:79.285%}.page-report .mid-right{width:20.715%}
+.page-report .r14{height:49.27pt}.page-report .mid td{border:0.75pt solid #000;text-align:center;font-size:9.9pt}
+.page-report .mid .subjects-head{font-size:9.9pt;font-weight:normal;letter-spacing:.2px}
+.page-report .vh{position:relative;height:49.27pt;padding:0}.page-report .vh span{position:absolute;left:50%;top:50%;width:49.27pt;margin-left:-24.635pt;margin-top:-6pt;height:12pt;transform:rotate(-90deg);text-align:center;font-weight:bold;line-height:1.0;font-size:9.4pt}
+.page-report .mid .sp{border-left:0.75pt solid #000;border-right:0.75pt solid #000;padding:0}
+.page-report .s1{height:18.9pt}
+.page-report .s2{height:21.6pt}
+.page-report .s3{height:18.23pt}
+.page-report .s4{height:17.55pt}
+.page-report .s5{height:18.9pt}
+.page-report .s6{height:20.25pt}
+.page-report .s7{height:17.55pt}
+.page-report .s8{height:16.88pt}
+.page-report .s9{height:18.9pt}
+.page-report .s10{height:18.23pt}
+.page-report .s11{height:18.23pt}
+.page-report .s12{height:18.9pt}
+.page-report .dense-13 .srow{height:17.24pt}
+.page-report .dense-14 .srow{height:16.01pt}
+.page-report .dense-15 .srow{height:14.94pt}
+.page-report .dense-16 .srow{height:14.01pt}
+.page-report .dense-17 .srow{height:13.18pt}
+.page-report .dense-18 .srow{height:12.45pt}
+.page-report .dense-19 .srow{height:11.79pt}
+.page-report .dense-20 .srow{height:11.21pt}
+.page-report .dense-21 .srow{height:10.67pt}
+.page-report .dense-22 .srow{height:10.19pt}
+.page-report .dense-23 .srow{height:9.74pt}
+.page-report .dense-24 .srow{height:9.34pt}
+.page-report .dense-25 .srow{height:8.96pt}
+.page-report .dense-26 .srow{height:8.62pt}
+.page-report .dense-27 .srow{height:8.3pt}
+.page-report .dense-28 .srow{height:8.0pt}
+.page-report .dense-29 .srow{height:7.73pt}
+.page-report .dense-30 .srow{height:7.47pt}
+.page-report .band td{background:#dce6f1}.page-report .mid .sname{text-align:left;padding-left:3pt;white-space:nowrap}.page-report .mid .tot,.page-report .mid .grade{font-weight:bold}.page-report .mid .remark{font-size:8.5pt}
+.page-report .r27{height:27.0pt}.page-report .r27 td.sum{border-left:0;border-right:0;border-top:0.75pt solid #000;border-bottom:0.75pt solid #000;text-align:left;font-size:9.9pt;white-space:nowrap}.page-report .r27 td.sp{border-top:0;border-bottom:0}
+.page-report .k1{height:20.25pt}
+.page-report .k2{height:20.25pt}
+.page-report .k3{height:20.25pt}
+.page-report .k4{height:20.25pt}
+.page-report .k5{height:20.25pt}
+.page-report .mid .k1 td,.page-report .mid .k3 td,.page-report .mid .k4 td,.page-report .mid .k5 td{border-left:0;border-right:0;border-top:0;border-bottom:0}
+.page-report .mid .k2 td.sum2{border-top:0.75pt solid #000;border-bottom:0.75pt solid #000;border-left:0;border-right:0;text-align:left;font-size:10.8pt;white-space:nowrap}
+.page-report .mid td.keynum{border:0.75pt solid #000;font-weight:bold}.page-report .mid td.keyword{border:0.75pt solid #000;border-right:0;font-weight:bold;text-align:left;padding-left:3pt;white-space:nowrap}
+.page-report .mid .k1 td.sp,.page-report .mid .k2 td.sp,.page-report .mid .k3 td.sp,.page-report .mid .k4 td.sp,.page-report .mid .k5 td.sp{border-left:0.75pt solid #000;border-right:0.75pt solid #000}
+.page-report .nob{border:0 !important}
+.page-report .panel td{border:0.75pt solid #000;padding:0 3pt}.page-report .panel{table-layout:fixed}
+.page-report .p-head{height:49.27pt}.page-report .p-head td,.page-report .p-psy td,.page-report .p-scale td{font-weight:bold;text-align:center}.page-report .p-scale{height:18.9pt}.page-report .p-scale td,.page-report .p-psy td{background:#dce6f1}.page-report .p-psy{height:27.0pt}
+.page-report .tr1{height:21.6pt}
+.page-report .tr2{height:18.23pt}
+.page-report .tr3{height:17.55pt}
+.page-report .tr4{height:18.9pt}
+.page-report .tr5{height:20.25pt}
+.page-report .tr6{height:17.55pt}
+.page-report .tr7{height:16.88pt}
+.page-report .tr8{height:18.9pt}
+.page-report .tr9{height:18.23pt}
+.page-report .tr10{height:18.23pt}
+.page-report .tr11{height:18.9pt}
+.page-report .ps{height:20.25pt}.page-report .panel .trait{font-weight:bold;text-align:left;font-size:9pt;padding:0 1.5pt 0 2pt;white-space:nowrap;overflow:hidden}.page-report .panel .rate{text-align:center;font-weight:bold}.page-report .panel .band td{background:#dce6f1}
+.page-report .r34{height:28.35pt}
+.page-report .r35{height:22.28pt}
+.page-report .r36{height:21.6pt}
+.page-report .r37{height:20.93pt}
+.page-report .rline{border-bottom:0.75pt solid #000;font-size:10.8pt;text-align:left}.page-report .rl{margin-right:3pt}.page-report .lab{font-size:10.8pt}.page-report .lab-sm{font-size:9.9pt}
+.page-report .sigcell{padding:0 0 0 3pt}.page-report .sig{height:21pt;width:auto;vertical-align:middle}
+.page-report .gradekey{height:27.68pt;border-top:0.75pt solid #000;display:flex;align-items:center;justify-content:center;text-align:center;font-family:Calibri,Carlito,'Liberation Sans',sans-serif;font-style:italic;font-size:9pt}

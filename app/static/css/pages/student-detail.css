@@ -1,0 +1,9 @@
+/* pages/student-detail.css - one student: collapsed details, results per class, subject toggles. */
+.page-student-detail .subject-toggle{margin:.2rem .6rem .2rem 0}
+.page-student-detail .head{display:flex;align-items:center;gap:.8rem;flex-wrap:wrap}
+.page-student-detail .head h1{margin:0}
+.page-student-detail .details-btn{margin:.8rem 0 1rem}
+.page-student-detail .details-btn>summary{display:inline-block;background:var(--blue);color:#fff;padding:.5rem 1rem;border-radius:8px;cursor:pointer;list-style:none}
+.page-student-detail .details-btn>summary::-webkit-details-marker{display:none}
+.page-student-detail .details-btn[open]>summary{margin-bottom:.8rem}
+.page-student-detail .results-table td .btn{margin:0}

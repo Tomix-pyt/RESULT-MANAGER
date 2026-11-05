@@ -1,0 +1,78 @@
+{% extends "base.html" %}{% set page = "class-detail" %}{% from "macros.html" import post_btn with context %}{% block title %}{{ cs.class_.name }}{% endblock %}
+{% block content %}
+<p><a href="{{ url_for('operator.classes', session_id=cs.academic_session_id) }}">← Classes</a></p>
+<h1>{{ cs.class_.name }} · {{ cs.academic_session.name }}</h1>
+
+{% if term %}
+<div class="card results-card"><h2>Results</h2>
+  <div class="results-top">
+    <form method="get" class="inline term-picker">Term:
+      <select name="term_id" onchange="this.form.submit()">{% for t in terms %}<option value="{{ t.id }}" {{ 'selected' if t.id == term.id }}>{{ t.name }}</option>{% endfor %}</select></form>
+    <form method="post" action="{{ url_for('results.form_teacher', cs_id=cs.id) }}" class="inline">{{ csrf_field() }}<input type="hidden" name="term_id" value="{{ term.id }}">
+      <label class="inline-label">Form teacher
+        <select name="staff_id"><option value="">– none –</option>{% for t in staff %}<option value="{{ t.id }}" {{ 'selected' if cs.form_teacher_id == t.id }}>{{ t.full_name }}</option>{% endfor %}</select></label>
+      <button class="btn small ghost">Save</button></form>
+  </div>
+  <div class="actions">
+    <a class="btn" href="{{ url_for('results.class_scores', cs_id=cs.id, term_id=term.id) }}">Enter scores</a>
+    <a class="btn ghost" target="_blank" href="{{ url_for('results.sheet_preview', cs_id=cs.id, term_id=term.id, kind='terminal') }}">Print {{ term.name }} results (whole class)</a>
+    <a class="btn ghost" target="_blank" href="{{ url_for('results.sheet_preview', cs_id=cs.id, term_id=term.id, kind='annual') }}">Print annual results</a>
+    {% if summary.all_locked %}{{ post_btn(url_for('results.lock_results', cs_id=cs.id), '🔓 Unlock term', 'btn small', 'Allow scores to be edited again for ' ~ term.name ~ '?', {'term_id': term.id, 'lock': '0'}) }}
+    {% else %}{{ post_btn(url_for('results.lock_results', cs_id=cs.id), '🔒 Lock term', 'btn small', 'Lock ' ~ term.name ~ '? Nobody will be able to change these scores until you unlock.', {'term_id': term.id, 'lock': '1'}) }}
+    {% if summary.locked_subjects %}{{ post_btn(url_for('results.lock_results', cs_id=cs.id), '🔓 Unlock all', 'btn small ghost', 'Unlock every locked subject?', {'term_id': term.id, 'lock': '0'}) }}{% endif %}{% endif %}
+  </div>
+  <p class="muted small">{{ summary.subjects_with_assessments }} of {{ summary.subjects_total }} subjects have assessments for {{ term.name }}.{% if summary.locked_subjects %}  {{ summary.locked_subjects }} subject(s) locked.{% endif %}
+    Results are worked out automatically each time scores are saved.</p>
+</div>
+{% endif %}
+
+<div class="card"><h2>Subjects & teachers</h2>
+<div class="scroll"><table>
+<tr><th>Subject</th><th>Teacher(s)</th><th>Assessments</th><th></th></tr>
+{% for x in class_subjects %}
+<tr><td>{{ x.subject.name }}</td>
+<td>{% for a in x.staff_assignments %}<span class="chip">{{ a.staff.full_name }}
+  <form method="post" action="{{ url_for('operator.staff_unassign', aid=a.id) }}" class="inline" data-confirm="Remove {{ a.staff.full_name }} from {{ x.subject.name }}?">{{ csrf_field() }}<button class="x" title="Remove">×</button></form></span>{% endfor %}
+  <form method="post" action="{{ url_for('operator.staff_assign', csub_id=x.id) }}" class="inline">{{ csrf_field() }}
+    <select name="staff_id">{% for t in staff %}<option value="{{ t.id }}">{{ t.full_name }}</option>{% endfor %}</select>
+    <button class="btn small ghost">Assign</button></form></td>
+<td><a href="{{ url_for('operator.assessment_settings') }}">Set up →</a></td>
+<td>{{ post_btn(url_for('operator.class_subject_remove', csub_id=x.id), 'Remove', 'btn small danger', 'Remove ' ~ x.subject.name ~ ' from this class?') }}</td></tr>
+{% else %}<tr><td colspan="4" class="muted">No subjects yet.</td></tr>{% endfor %}
+</table></div>
+<div class="row">
+{% if subjects_free %}<form method="post" action="{{ url_for('operator.class_subject_add', cs_id=cs.id) }}" class="row">{{ csrf_field() }}
+  <label>Add subject <select name="subject_id">{% for s in subjects_free %}<option value="{{ s.id }}">{{ s.name }}</option>{% endfor %}</select></label>
+  <button class="btn small">Add</button></form>{% endif %}
+{% if copy_from %}<form method="post" action="{{ url_for('operator.class_copy', cs_id=cs.id) }}" class="row">{{ csrf_field() }}
+  <label>Copy setup from <select name="from_cs_id">{% for o in copy_from %}<option value="{{ o.id }}">{{ o.class_.name }} · {{ o.academic_session.name }}</option>{% endfor %}</select></label>
+  <label><input type="checkbox" name="include_staff" checked> with teachers</label>
+  <button class="btn small ghost">Copy</button></form>{% endif %}
+</div></div>
+
+<div class="card"><h2>Students ({{ enrolled|length }})</h2>
+<p class="small muted">Bulk enrol, import from CSV, promote and transfer are on the <a href="{{ url_for('operator.enrollment', cs_id=cs.id) }}">Enrollment page</a>.</p>
+<div class="scroll"><table>
+<tr><th>#</th><th>Admission no.</th><th>Name</th><th>Results</th><th></th></tr>
+{% for e in enrolled %}<tr><td>{{ e.roll_number or loop.index }}</td><td>{{ e.student.admission_number }}</td>
+<td><a href="{{ url_for('operator.student_detail', sid=e.student_id) }}">{{ e.student.full_name }}</a></td>
+<td class="result-links">{% if term %}<a href="{{ url_for('results.student_scores', eid=e.id, term_id=term.id) }}">Scores</a> ·
+  <a target="_blank" href="{{ url_for('results.sheet_preview', cs_id=cs.id, term_id=term.id, kind='terminal', enrollment=e.id) }}">Print</a> ·
+  <a target="_blank" href="{{ url_for('results.sheet_preview', cs_id=cs.id, kind='annual', enrollment=e.id) }}">Annual</a>{% endif %}</td>
+<td>{{ post_btn(url_for('operator.enrollment_remove', eid=e.id), 'Remove', 'btn small danger', 'Remove ' ~ e.student.full_name ~ ' from this class?') }}</td></tr>
+{% else %}<tr><td colspan="5" class="muted">No active students in this class.</td></tr>{% endfor %}
+</table></div>
+{% if former %}<details class="edit left-school"><summary>Left the school ({{ former|length }})</summary>
+<p class="muted small">Graduated, withdrawn or transferred students are not in the active class list. Their results are kept and can still be printed.</p>
+<div class="scroll"><table><tr><th>Admission no.</th><th>Name</th><th>Status</th><th>Results</th></tr>
+{% for e in former %}<tr><td>{{ e.student.admission_number }}</td><td><a href="{{ url_for('operator.student_detail', sid=e.student_id) }}">{{ e.student.full_name }}</a></td><td>{{ e.student.status }}</td>
+<td class="result-links">{% if term %}<a href="{{ url_for('results.student_scores', eid=e.id, term_id=term.id) }}">Scores</a> ·
+  <a target="_blank" href="{{ url_for('results.sheet_preview', cs_id=cs.id, term_id=term.id, kind='terminal', enrollment=e.id) }}">Print</a> ·
+  <a target="_blank" href="{{ url_for('results.sheet_preview', cs_id=cs.id, kind='annual', enrollment=e.id) }}">Annual</a>{% endif %}</td></tr>{% endfor %}
+</table></div></details>{% endif %}</div>
+
+{% if not enrolled_total and not class_subjects %}
+<div class="card"><h2>Danger zone</h2>
+{{ post_btn(url_for('operator.class_session_delete', cs_id=cs.id), 'Remove this class from the session', 'btn danger', 'Remove ' ~ cs.class_.name ~ ' from ' ~ cs.academic_session.name ~ '?') }}</div>
+{% endif %}
+{% endblock %}

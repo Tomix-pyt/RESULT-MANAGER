@@ -1,0 +1,4 @@
+/* pages/audit.css  -  only affects pages whose <main> has class "page-audit".
+   Shared styles are in ../base.css. Audit log table and pager. */
+.page-audit .when{white-space:nowrap}
+.page-audit .pager{display:flex;gap:1rem;align-items:center;justify-content:center;margin:1rem 0}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}{% set page = "settings" %}{% from "macros.html" import post_btn with context %}{% block title %}Settings{% endblock %}
+{% block content %}
+<h1>School settings</h1>
+<p class="muted">These appear on report cards and printed results.</p>
+<form method="post" class="card">{{ csrf_field() }}
+  {% for key, label, default in fields %}
+  <label>{{ label }}
+    {% if key in ('principal_remark','report_footer') %}<textarea name="{{ key }}" rows="2">{{ values[key] or '' }}</textarea>
+    {% else %}<input name="{{ key }}" value="{{ values[key] or '' }}">{% endif %}</label>
+  {% endfor %}
+  <button class="btn">Save settings</button>
+</form>
+<div class="card"><h2>Logo and principal's signature</h2>
+  <p class="muted">Printed on every result. PNG or JPG; the signature looks best on a white background.</p>
+  <div class="brand-grid">
+  {% for name, title in [('logo', 'School logo'), ('signature', "Principal's signature")] %}
+    <div class="brand-box"><h3>{{ title }}</h3>
+      <img class="brand-img" src="{{ url_for('results.branding_file', name=name) }}?v={{ range(1, 10**6) | random }}" alt="{{ title }}">
+      <form method="post" action="{{ url_for('results.branding_upload', name=name) }}" enctype="multipart/form-data">{{ csrf_field() }}
+        <input type="file" name="image" accept="image/png,image/jpeg" required>
+        <button class="btn small">Replace</button></form>
+      {{ post_btn(url_for('results.branding_reset', name=name), 'Use original', 'btn small ghost') }}
+    </div>
+  {% endfor %}
+  </div></div>{% endblock %}

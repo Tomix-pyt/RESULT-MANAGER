@@ -1,0 +1,27 @@
+{% extends "base.html" %}{% set page = "dashboard" %}{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h1>Overview</h1>
+<p class="muted">
+  Session: <strong>{{ stats.current_session.name if stats.current_session else 'not set' }}</strong> ·
+  Term: <strong>{{ stats.current_term.name if stats.current_term else 'not set' }}</strong>
+</p>
+{% if not stats.current_session or not stats.current_term %}
+<div class="flash error">Set the current session and term on the <a href="{{ url_for('operator.sessions') }}">Sessions</a> page to get started.</div>{% endif %}
+<div class="grid">
+  <div class="stat"><span>{{ stats.students }}</span>Active students</div>
+  <a class="stat {{ 'warn' if stats.unenrolled }}" href="{{ url_for('operator.enrollment') }}"><span>{{ stats.unenrolled }}</span>Added but not enrolled</a>
+  <div class="stat"><span>{{ stats.staff }}</span>Staff</div>
+  <div class="stat"><span>{{ stats.drafts }}</span>Draft results</div>
+  <!-- <div class="stat warn"><span>{{ stats.pending }}</span>Awaiting review</div> -->
+  <!-- <div class="stat"><span>{{ stats.approved }}</span>Approved</div> -->
+  <div class="stat"><span>{{ stats.locked }}</span>Locked</div>
+</div>
+<div class="card"><h2>Set-up checklist</h2>
+<ol>
+  <li><a href="{{ url_for('operator.sessions') }}">Create the session and terms</a>, then mark them current</li>
+  <li><a href="{{ url_for('operator.subjects') }}">Add subjects</a> and <a href="{{ url_for('operator.classes') }}">open classes</a> for the session</li>
+  <li><a href="{{ url_for('operator.assessment_settings') }}">Configure assessments once</a>, then add subjects and assign teachers on each class page</li>
+  <li><a href="{{ url_for('operator.enrollment') }}">Add and enrol students</a> (CSV import is quickest)</li>
+  <li><a href="{{ url_for('operator.grading') }}">Create the grading scale</a> and fill in <a href="{{ url_for('operator.settings') }}">school settings</a></li>
+</ol></div>
+{% endblock %}

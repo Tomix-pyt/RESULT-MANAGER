@@ -1,0 +1,33 @@
+{% extends "base.html" %}{% set page = "classes" %}{% from "macros.html" import post_btn with context %}{% block title %}Classes{% endblock %}
+{% block content %}
+<h1>Classes</h1>
+<div class="card"><h2>New class</h2>
+<form method="post" class="row">{{ csrf_field() }}
+  <label>Name <input name="name" placeholder="JSS 1 A" required></label>
+  <label>Level <input name="level" placeholder="JSS 1"></label>
+  <label>Arm <input name="arm" placeholder="A"></label>
+  <button class="btn">Create</button></form></div>
+<form method="get" class="inline session-picker">Session:
+  <select name="session_id" onchange="this.form.submit()">
+    {% for s in sessions %}<option value="{{ s.id }}" {{ 'selected' if session and s.id==session.id }}>{{ s.name }}</option>{% endfor %}
+  </select></form>
+{% if not session %}<div class="card">Create an academic session first.</div>{% endif %}
+<div class="scroll"><table>
+<tr><th>Class</th><th>Arm</th><th>In {{ session.name if session else '…' }}</th><th></th></tr>
+{% for c, cs in rows %}
+<tr><td>{{ c.name }} {% if not c.is_active %}<span class="badge off">inactive</span>{% endif %}</td><td>{{ c.arm or '–' }}</td>
+<td>{% if cs %}<a href="{{ url_for('operator.class_detail', cs_id=cs.id) }}">Open class →</a>
+    {% elif session and c.is_active %}{{ post_btn(url_for('operator.class_open', cid=c.id), 'Open for ' ~ session.name, 'btn small', None, {'session_id': session.id}) }}
+    {% else %}–{% endif %}</td>
+<td><div class="actions">
+  <details class="edit"><summary>Edit</summary>
+    <form method="post" action="{{ url_for('operator.class_edit', cid=c.id) }}" class="row">{{ csrf_field() }}
+      <label>Name <input name="name" value="{{ c.name }}" required></label>
+      <label>Level <input name="level" value="{{ c.level or '' }}"></label>
+      <label>Arm <input name="arm" value="{{ c.arm or '' }}"></label>
+      <button class="btn small">Save</button></form></details>
+  {% if c.is_active %}{{ post_btn(url_for('operator.class_deactivate', cid=c.id), 'Deactivate', 'btn small danger', 'Deactivate ' ~ c.name ~ '? Past records are kept.') }}
+  {% else %}{{ post_btn(url_for('operator.class_reactivate', cid=c.id), 'Reactivate', 'btn small') }}{% endif %}
+</div></td></tr>
+{% else %}<tr><td colspan="4" class="muted">No classes yet.</td></tr>{% endfor %}</table></div>
+{% endblock %}

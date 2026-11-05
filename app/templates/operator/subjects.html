@@ -1,0 +1,22 @@
+{% extends "base.html" %}{% set page = "subjects" %}{% from "macros.html" import post_btn with context %}{% block title %}Subjects{% endblock %}
+{% block content %}
+<h1>Subjects</h1>
+<div class="card"><form method="post" class="row">{{ csrf_field() }}
+  <label>Code <input name="code" placeholder="MATH" required></label>
+  <label>Name <input name="name" placeholder="Mathematics" required></label>
+  <label>Description <input name="description"></label><button class="btn">Add subject</button></form></div>
+<div class="scroll"><table><tr><th>Code</th><th>Name</th><th>Status</th><th></th></tr>
+{% for s in subjects %}<tr><td>{{ s.code }}</td><td>{{ s.name }}</td>
+<td>{% if s.is_active %}<span class="badge ok">active</span>{% else %}<span class="badge off">inactive</span>{% endif %}</td>
+<td><div class="actions">
+  <details class="edit"><summary>Edit</summary>
+    <form method="post" action="{{ url_for('operator.subject_edit', sid=s.id) }}" class="row">{{ csrf_field() }}
+      <label>Code <input name="code" value="{{ s.code }}" required></label>
+      <label>Name <input name="name" value="{{ s.name }}" required></label>
+      <label>Description <input name="description" value="{{ s.description or '' }}"></label>
+      <button class="btn small">Save</button></form></details>
+  {% if s.is_active %}{{ post_btn(url_for('operator.subject_deactivate', sid=s.id), 'Deactivate', 'btn small danger', 'Deactivate ' ~ s.name ~ '? Existing results are kept.') }}
+  {% else %}{{ post_btn(url_for('operator.subject_reactivate', sid=s.id), 'Reactivate', 'btn small') }}{% endif %}
+</div></td></tr>
+{% else %}<tr><td colspan="4" class="muted">No subjects yet.</td></tr>{% endfor %}
+</table></div>{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "base.html" %}{% set page = "enrollment" %}{% from "macros.html" import post_btn with context %}{% block title %}Enrollment{% endblock %}
+{% block content %}
+<h1>Enrollment</h1>
+<form method="get" class="card row">
+  <label>Class <select name="cs_id" onchange="this.form.submit()">
+    <option value="">Choose a class…</option>
+    {% for x in all_cs %}<option value="{{ x.id }}" {{ 'selected' if cs and x.id==cs.id }}>{{ x.academic_session.name }} · {{ x.class_.name }}</option>{% endfor %}
+  </select></label><noscript><button class="btn">Go</button></noscript></form>
+{% if not all_cs %}<div class="card muted">No classes are open for any session yet. Open a class from the <a href="{{ url_for('operator.classes') }}">Classes</a> page first.</div>{% endif %}
+
+{% if cs %}
+<h2>{{ cs.class_.name }} · {{ cs.academic_session.name }} <span class="muted">({{ enrolled|length }} students)</span></h2>
+
+<div class="card">
+<div class="scroll"><table>
+<tr><th><input type="checkbox" data-all="student_ids" title="Select all"></th><th>Roll</th><th>Admission no.</th><th>Name</th><th>Status</th><th>Transfer to</th><th></th></tr>
+{% for e in enrolled %}<tr>
+  <td><label><input type="checkbox" name="student_ids" value="{{ e.student_id }}" form="listform"></label></td>
+  <td><form method="post" action="{{ url_for('operator.enrollment_roll', eid=e.id) }}" class="inline">{{ csrf_field() }}
+      <input type="number" name="roll_number" min="1" value="{{ e.roll_number or '' }}"><button class="btn small ghost">Set</button></form></td>
+  <td>{{ e.student.admission_number }}</td>
+  <td><a href="{{ url_for('operator.student_detail', sid=e.student_id) }}">{{ e.student.full_name }}</a></td>
+  <td>{{ e.student.status }}</td>
+  <td>{% if same_session %}<form method="post" action="{{ url_for('operator.enrollment_transfer', eid=e.id) }}" class="inline" data-confirm="Transfer {{ e.student.full_name }}?">{{ csrf_field() }}
+      <select name="to_cs_id">{% for x in same_session %}<option value="{{ x.id }}">{{ x.class_.name }}</option>{% endfor %}</select><button class="btn small ghost">Move</button></form>{% else %}–{% endif %}</td>
+  <td>{{ post_btn(url_for('operator.enrollment_remove', eid=e.id), 'Remove', 'btn small danger', 'Remove ' ~ e.student.full_name ~ ' from this class?') }}</td>
+</tr>{% else %}<tr><td colspan="7" class="muted">Nobody enrolled yet.</td></tr>{% endfor %}
+</table></div>
+{% if enrolled %}
+<form method="post" action="{{ url_for('operator.enrollment_promote', cs_id=cs.id) }}" id="listform">{{ csrf_field() }}
+<div class="row">
+  {% if other_session %}<label>Promote ticked students to
+    <select name="to_cs_id">{% for x in other_session %}<option value="{{ x.id }}">{{ x.academic_session.name }} · {{ x.class_.name }}</option>{% endfor %}</select></label>
+  <button class="btn">Promote</button>{% endif %}
+  <button class="btn danger" formaction="{{ url_for('operator.enrollment_graduate', cs_id=cs.id) }}" onclick="return confirm('Mark the ticked students as graduated?')">Mark as graduated</button>
+</div>
+<p class="small muted">Tick students in the table, then promote or graduate them. Promoting keeps their record in this class. Transfer only works before a student has scores.</p>
+</form>
+{% endif %}
+{% if enrolled %}<div class="roll-tools">{{ post_btn(url_for('operator.enrollment_rolls', cs_id=cs.id), 'Number alphabetically (1…n)', 'btn small ghost') }}</div>{% endif %}
+</div>
+
+<div class="card"><h2>Add students</h2>
+{% if candidates %}
+<form method="post" action="{{ url_for('operator.enrollment_bulk', cs_id=cs.id) }}">{{ csrf_field() }}
+  <div class="row"><input data-filter="#cands" placeholder="Filter by name or number…"><label><input type="checkbox" data-all="student_ids"> Select all shown</label></div>
+  <div class="checklist" id="cands">
+    {% for s in candidates %}<label><input type="checkbox" name="student_ids" value="{{ s.id }}"> {{ s.full_name }} <span class="muted small">{{ s.admission_number }}</span></label>{% endfor %}
+  </div>
+  <button class="btn">Enrol ticked students</button>
+</form>
+{% else %}<p class="muted">Every active student is already in a class this session. <a href="{{ url_for('operator.students') }}">Add new students →</a></p>{% endif %}
+</div>
+
+<div class="card"><h2>Import from CSV</h2>
+<p class="small muted">Columns: <code>admission_number, first_name, last_name</code> and optionally <code>middle_name, gender . Save from Excel as "CSV (Comma delimited)".</p>
+<form method="post" action="{{ url_for('operator.enrollment_import', cs_id=cs.id) }}" enctype="multipart/form-data">{{ csrf_field() }}
+  <label>CSV file <input type="file" name="file" accept=".csv,text/csv"></label>
+  <label>…or paste rows <textarea name="text" rows="4" placeholder="admission_number,first_name,last_name&#10;CSS/001,Iorhen,Tomix"></textarea></label>
+  <label><input type="checkbox" name="enroll" checked> Enrol imported students into this class</label>
+  <button class="btn">Import</button>
+</form></div>
+
+
+{% endif %}
+{% endblock %}

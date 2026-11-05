@@ -1,0 +1,34 @@
+{% extends "base.html" %}{% set page = "student-detail" %}{% block title %}{{ st.full_name }}{% endblock %}
+{% block content %}
+<p><a href="{{ url_for('operator.students' if st.status == 'ACTIVE' else 'operator.former_students') }}">← {{ 'Students' if st.status == 'ACTIVE' else 'Former students' }}</a></p>
+<div class="head"><h1>{{ st.full_name }} <span class="muted">{{ st.admission_number }}</span></h1>
+  <span class="badge {{ 'ok' if st.status == 'ACTIVE' }}">{{ st.status.title() }}</span></div>
+
+<details class="edit details-btn"><summary>Edit details</summary>
+<form method="post" class="row">{{ csrf_field() }}
+  <label>First name <input name="first_name" value="{{ st.first_name }}" required></label>
+  <label>Middle name <input name="middle_name" value="{{ st.middle_name or '' }}"></label>
+  <label>Last name <input name="last_name" value="{{ st.last_name }}" required></label>
+  <label>Gender <select name="gender"><option value="">–</option>{% for g_ in ['Male','Female'] %}<option {{ 'selected' if st.gender==g_ }}>{{ g_ }}</option>{% endfor %}</select></label>
+  <label>Date of birth <input type="date" name="date_of_birth" value="{{ st.date_of_birth or '' }}"></label>
+  <label>Status <select name="status">{% for x in ['ACTIVE','INACTIVE','GRADUATED','TRANSFERRED','WITHDRAWN'] %}<option {{ 'selected' if st.status==x }}>{{ x }}</option>{% endfor %}</select></label>
+  <button class="btn">Save</button></form></details>
+
+{% for e in enrollments %}
+{% set mine = e.subjects|map(attribute='class_subject_id')|list %}
+<div class="card"><h2>{{ e.class_session.class_.name }} · {{ e.class_session.academic_session.name }}</h2>
+  <div class="scroll"><table class="results-table"><tr><th>Results</th><th>Enter / correct scores</th><th>Print</th></tr>
+  {% for t in terms[e.id] %}<tr><td>{{ t.name }}</td>
+    <td><a class="btn small ghost" href="{{ url_for('results.student_scores', eid=e.id, term_id=t.id) }}">Scores</a></td>
+    <td><a class="btn small" target="_blank" href="{{ url_for('results.sheet_preview', cs_id=e.class_session_id, term_id=t.id, kind='terminal', enrollment=e.id) }}">Terminal result</a></td></tr>
+  {% endfor %}
+  <tr><td>Whole year</td><td></td><td><a class="btn small" target="_blank" href="{{ url_for('results.sheet_preview', cs_id=e.class_session_id, kind='annual', enrollment=e.id) }}">Annual result</a></td></tr>
+  </table></div>
+  <p class="muted">Subjects this student takes (starts as the class list; adjust for this student only):</p>
+{% for x in e.class_session.class_subjects|sort(attribute='id') %}
+<form method="post" class="inline subject-toggle"
+  action="{{ url_for('operator.student_subject', eid=e.id, csub_id=x.id, action='remove' if x.id in mine else 'add') }}">{{ csrf_field() }}
+  <button class="btn small {{ '' if x.id in mine else 'ghost' }}">{{ '✓' if x.id in mine else '+' }} {{ x.subject.name }}</button></form>
+{% endfor %}</div>
+{% else %}<div class="card muted">Not enrolled in any class yet.</div>{% endfor %}
+{% endblock %}

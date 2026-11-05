@@ -1,0 +1,18 @@
+{% extends "base.html" %}{% set page = "student-new" %}{% block title %}Add a student{% endblock %}
+{% block content %}
+<p><a href="{{ url_for('operator.students') }}">← Students</a></p>
+<h1>Add a student</h1>
+<form method="post" class="card form-card">{{ csrf_field() }}
+  <div class="row">
+    <label>Admission no. <input name="admission_number" placeholder="CSS/2026/001" required autofocus></label>
+    <label>First name <input name="first_name" required></label>
+    <label>Middle name <input name="middle_name"></label>
+    <label>Last name <input name="last_name" required></label>
+    <label>Gender <select name="gender"><option value="">–</option><option>Male</option><option>Female</option></select></label>
+    <label>Date of birth <input type="date" name="date_of_birth"></label>
+  </div>
+  <p class="muted small">After saving, enrol the student in a class from the Enrollment page (the dashboard shows how many are still waiting).</p>
+  <div class="actions"><button class="btn">Save student</button><button class="btn ghost" name="again" value="1">Save &amp; add another</button>
+    <a class="btn ghost" href="{{ url_for('operator.students') }}">Cancel</a></div>
+</form>
+{% endblock %}

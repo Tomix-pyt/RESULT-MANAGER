@@ -1,0 +1,124 @@
+{% set page = "report" %}<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{{ title }}</title>
+<link rel="stylesheet" href="{{ css_href }}">
+</head>
+<body class="page-report">
+
+{% macro cols() %}<colgroup><col class="ca"><col class="cb"><col class="cc"><col class="cd"><col class="ce"><col class="cf"><col class="cg"><col class="ch"><col class="ci"><col class="cj"><col class="ck"><col class="cl"><col class="cm"><col class="cn"></colgroup>{% endmacro %}
+
+{% if not pdf %}
+<div class="toolbar">
+  <a class="tb-btn" href="{{ back_url }}">← Back</a>
+  <span class="tb-title">{{ title }} · {{ cards|length }} sheet{{ '' if cards|length == 1 else 's' }}</span>
+  <button class="tb-btn" onclick="window.print()">Print</button>
+  <a class="tb-btn tb-primary" href="{{ pdf_url }}">Download PDF</a>
+</div>
+{% endif %}
+
+{% for c in cards %}
+{% set s = c.student %}
+<section class="sheet {{ c.kind }}">
+
+  <!-- rows 1-6 : school heading + logo -->
+  <table class="head"><tr>
+    <td class="logo-cell"><img class="logo-img" src="{{ logo_src }}" alt=""></td>
+    <td class="titles">
+      <div class="title t1">{{ c.school.name }}</div>
+      <div class="title t2">{{ c.school.region }}</div>
+      <div class="title t3">{{ c.school.address }}</div>
+    </td></tr></table>
+  <div class="gap g7"></div>
+
+  <!-- rows 8-12 : student's information (each label has a rule after it, the value sits to its right) -->
+  <div class="bar b8">{{ labels.BAR_INFO }}</div>
+  <table class="info">{{ cols() }}
+    <tr class="r9"><td class="lbl vl vr">Name:</td><td colspan="5" class="val">{{ s.name.title() }}</td>
+      <td class="lbl vr">Sex:</td><td colspan="2" class="val ctr">{{ s.sex or '__' }}</td>
+      <td colspan="2" class="lbl vr">Class:</td><td colspan="3" class="val">{{ s.class }}</td></tr>
+    <tr class="r10"><td class="lbl vl vr">Term:</td><td colspan="8" class="val">{{ s.term }}</td>
+      <td colspan="2" class="lbl vr">Vacation:</td><td colspan="3" class="val">{{ s.vacation }}</td></tr>
+    <tr class="r11 last"><td class="lbl vl vr">Student's ID:</td><td colspan="4" class="val">{{ s.id }}</td>
+      <td colspan="2" class="lbl vr">Session:</td><td colspan="2" class="val ctr">{{ s.session }}</td>
+      <td colspan="2" class="lbl vr">N.Term Begins:</td><td colspan="3" class="val">{{ s.next_term }}</td></tr>
+  </table>
+  <div class="gap g12"></div>
+
+  <!-- rows 13-32 : performance breakdown (left) + affective / psychomotor (right) -->
+  <div class="bar b13">{{ labels.BAR_ANNUAL if c.kind == 'annual' else labels.BAR_TERMINAL }}</div>
+  {% set n = c.n_rows %}
+  <table class="mid-wrap"><tr>
+  <td class="mid-left">
+  <table class="mid{% if c.dense %} dense-{{ c.dense }}{% endif %}">
+    <colgroup><col class="ca"><col class="cb"><col class="cc"><col class="cd"><col class="ce"><col class="cf"><col class="cg"><col class="ch"><col class="ci"><col class="cj"><col class="ck"><col class="cl"></colgroup>
+    <tr class="r14">
+      <td class="subjects-head">{{ labels.SUBJECT_HEAD }}</td>
+      {% for h in c.columns %}<td class="vh"><span>{{ h }}</span></td>{% endfor %}
+      <td class="sp"></td></tr>
+    {% for row in c.rows %}
+    <tr class="srow s{{ loop.index }}{{ ' band' if loop.index is odd }}">
+      <td class="sname">{{ row.name }}</td>
+      {% for v in row.scores %}<td>{{ v }}</td>{% endfor %}
+      {% if c.kind == 'annual' %}
+        <td>{{ row.total }}</td><td>{{ row.average }}</td>
+      {% else %}
+        <td class="tot">{{ row.total }}</td>
+      {% endif %}
+      <td>{{ row.highest }}</td><td>{{ row.lowest }}</td><td>{{ row.position }}</td><td class="grade">{{ row.grade }}</td><td class="remark">{{ row.remark }}</td>
+      <td class="sp"></td></tr>
+    {% endfor %}
+    {% for i in range(c.blank_rows) %}
+    {% set k = c.rows|length + loop.index %}
+    <tr class="srow s{{ k }}{{ ' band' if k is odd }}"><td class="sname"></td>{% for j in range(10) %}<td></td>{% endfor %}<td class="sp"></td></tr>
+    {% endfor %}
+    <tr class="r27">
+      <td colspan="2" class="sum">{{ labels.LABEL_TOTAL_OBTAINABLE }} <b>{{ c.obtainable }}</b></td>
+      <td colspan="6" class="sum">{{ labels.LABEL_TOTAL_OBTAINED }} <b>{{ c.obtained }}</b></td>
+      <td colspan="3" class="sum">{{ labels.LABEL_TOT_IN_CLASS }} <b>{{ c.class_size }}</b></td><td class="sp"></td></tr>
+    {% for num, word in c.rating_key %}
+    <tr class="k{{ loop.index }}{{ ' band' if loop.index is odd }}">
+      {% if loop.index == 2 %}
+        <td colspan="2" class="sum2">{{ labels.LABEL_AVERAGE }} <b>{{ c.average }}</b></td>
+        <td colspan="7" class="sum2">{{ labels.LABEL_POSITION }} <b>{{ c.position }}</b></td>
+      {% else %}
+        <td colspan="9" class="nob"></td>
+      {% endif %}
+      <td class="keynum">{{ num }}</td><td class="keyword">{{ word }}</td><td class="sp"></td></tr>
+    {% endfor %}
+  </table></td>
+  <td class="mid-right">
+    <table class="panel"><colgroup><col class="cm"><col class="cn"></colgroup>
+      <tr class="p-head"><td colspan="2">{{ labels.AFFECTIVE_TITLE }}</td></tr>
+      <tr class="p-scale"><td colspan="2">{{ labels.RATING_SCALE_TITLE }}</td></tr>
+      {% for label, rating in c.affective %}
+      <tr class="tr{{ loop.index }}{{ ' band' if loop.index is even }}"><td class="trait">{{ label }}</td><td class="rate">{{ rating }}</td></tr>
+      {% endfor %}
+      <tr class="p-psy"><td colspan="2">{{ labels.PSYCHOMOTOR_TITLE }}</td></tr>
+      {% for label, rating in c.psychomotor %}
+      <tr class="ps"><td class="trait">{{ label }}</td><td class="rate">{{ rating }}</td></tr>
+      {% endfor %}
+    </table></td>
+  </tr></table>
+
+  <!-- rows 33-38 : remarks, signatures, grading key -->
+  <div class="bar b33">{{ labels.BAR_REMARKS }}</div>
+  <table class="remarks">{{ cols() }}
+    <tr class="r34"><td colspan="10" class="rline"><span class="rl">{{ labels.REMARK_FORM }}</span> {{ c.form_remark }}</td>
+      <td colspan="2" class="rline lab">Signature:</td><td colspan="2" class="rline"></td></tr>
+    <tr class="r35"><td class="rline"><span class="rl">Name:</span></td><td colspan="9" class="rline">{{ c.form_teacher }}</td>
+      <td colspan="2" class="rline lab-sm">Date:</td><td colspan="2" class="rline">{{ c.date }}</td></tr>
+    <tr class="r36"><td colspan="10" class="rline"><span class="rl">{{ labels.REMARK_PRINCIPAL }}</span> {{ c.principal_remark }}</td>
+      <td colspan="2" class="rline lab">Signature:</td><td colspan="2" class="rline sigcell"><img class="sig" src="{{ signature_src }}" alt=""></td></tr>
+    <tr class="r37"><td class="rline"><span class="rl">Name:</span></td><td colspan="9" class="rline">{{ c.principal }}</td>
+      <td colspan="2" class="rline lab-sm">Date:</td><td colspan="2" class="rline">{{ c.date }}</td></tr>
+  </table>
+  <div class="gradekey"><span>
+    {% if c.grading_key.fallback %}{{ c.grading_key.fallback }}
+    {% else %}<b>Grading keys:</b> ({% for g in c.grading_key.parts %}<b>"{{ g.grade }}"</b>- {{ g.remark }}({{ g.range }}){{ ' ' if not loop.last }}{% endfor %}){% endif %}
+  </span></div>
+</section>
+{% endfor %}
+</body>
+</html>

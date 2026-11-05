@@ -1,0 +1,30 @@
+{% extends "base.html" %}{% set page = "grading" %}{% from "macros.html" import post_btn with context %}{% block title %}Grading{% endblock %}
+{% block content %}
+<h1>Grading scales</h1>
+<div class="card"><h2>New scale</h2><form method="post" class="row">{{ csrf_field() }}
+  <label>Name <input name="name" placeholder="Standard Secondary Grading" required></label>
+  <label>Session <select name="session_id">{% for s in sessions %}<option value="{{ s.id }}">{{ s.name }}</option>{% endfor %}</select></label>
+  <label><input type="checkbox" name="load_default" checked> Start with A+ … F</label>
+  <button class="btn">Create</button></form></div>
+{% for sc in scales %}
+<div class="card"><h2>{{ sc.name }} <span class="muted">· {{ sc.academic_session.name }}</span></h2>
+<div class="actions scale-actions">
+  <details class="edit"><summary>Rename</summary><form method="post" action="{{ url_for('operator.scale_rename', scale_id=sc.id) }}" class="row">{{ csrf_field() }}
+    <label>Name <input name="name" value="{{ sc.name }}" required></label><button class="btn small">Save</button></form></details>
+  {{ post_btn(url_for('operator.scale_delete', scale_id=sc.id), 'Delete scale', 'btn small danger', 'Delete this whole grading scale?') }}
+</div>
+<div class="scroll"><table><tr><th>From</th><th>To</th><th>Grade</th><th>Remark</th><th></th></tr>
+{% for b in sc.boundaries %}<tr><td>{{ b.min_score|float }}</td><td>{{ b.max_score|float }}</td><td>{{ b.grade }}</td><td>{{ b.remark or '' }}</td>
+<td><div class="actions">
+  <details class="edit"><summary>Edit</summary><form method="post" action="{{ url_for('operator.boundary_edit', bid=b.id) }}" class="row">{{ csrf_field() }}
+    <label>From <input name="min_score" type="number" step="0.01" value="{{ b.min_score|float }}" required></label>
+    <label>To <input name="max_score" type="number" step="0.01" value="{{ b.max_score|float }}" required></label>
+    <label>Grade <input name="grade" value="{{ b.grade }}" required></label>
+    <label>Remark <input name="remark" value="{{ b.remark or '' }}"></label><button class="btn small">Save</button></form></details>
+  {{ post_btn(url_for('operator.boundary_delete', bid=b.id), 'Delete', 'btn small danger', 'Delete this boundary?') }}
+</div></td></tr>
+{% else %}<tr><td colspan="5" class="muted">No boundaries.</td></tr>{% endfor %}</table></div>
+<form method="post" action="{{ url_for('operator.boundary_add', scale_id=sc.id) }}" class="row">{{ csrf_field() }}
+  <label>From <input name="min_score" type="number" step="0.01" required></label><label>To <input name="max_score" type="number" step="0.01" required></label>
+  <label>Grade <input name="grade" required></label><label>Remark <input name="remark"></label><button class="btn small">Add boundary</button></form>
+</div>{% else %}<div class="card muted">No grading scales yet.</div>{% endfor %}{% endblock %}

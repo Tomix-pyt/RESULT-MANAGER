@@ -1,0 +1,9 @@
+/* pages/enrollment.css  -  only affects pages whose <main> has class "page-enrollment".
+   Shared styles are in ../base.css. Bulk enrol, CSV import, transfer, promote. */
+.page-enrollment .checklist{max-height:260px;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:.3rem;background:var(--card);margin:.6rem 0}
+.page-enrollment .checklist label{display:flex;gap:.5rem;align-items:center;margin:0;padding:.3rem .4rem;border-radius:6px;color:var(--text)}
+.page-enrollment .checklist label:hover{background:var(--soft)}
+.page-enrollment td label{margin:0}
+.page-enrollment .row label{margin:0}
+.page-enrollment input[name=roll_number]{width:4.5rem}
+.page-enrollment .roll-tools{margin-top:.6rem}
